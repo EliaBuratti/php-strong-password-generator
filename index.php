@@ -98,7 +98,8 @@ include __DIR__ . '/function.php';
             <?php if (isset($passworGen) && $passworGen != '') : ?>
                 <div class="alert alert-primary" role="alert">
                     Your new password is:
-                    <?= $passworGen; ?>
+                    <?= $passworGen;
+                    header('Location: ./pswPage.php'); ?>
                 </div>
             <?php endif ?>
 

@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 
 $limit = ceil((int)$_GET['limit']);
 $repeat = boolval($_GET['repeat']);
@@ -78,3 +80,5 @@ function randomPassword($length, $characters, $repeated)
     //var_dump($randomPassword);
     return $randomPassword;
 };
+
+$_SESSION['password'] = $passworGen;
