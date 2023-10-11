@@ -21,7 +21,88 @@ Possono essere scelti singolarmente (es. solo numeri) oppure possono essere comb
 Dare all’utente anche la possibilità di permettere o meno la ripetizione di caratteri uguali. 
 -->
 
-<?php ?>
+<?php
+
+$limit = ceil((int)$_GET['limit']);
+$repeat = boolval($_GET['repeat']);
+$letter = boolval($_GET['letters']);
+$number = boolval($_GET['number']);
+$symbol = boolval($_GET['symbol']);
+$character_list = '';
+$passworGen = '';
+$alertMessage = '';
+
+
+
+//var_dump($limit, $repeat, $letter, $number, $symbol);
+
+//var_dump($character_list);
+
+if (isset($limit)) {
+
+    $character_list = genCharacterList($letter, $number, $symbol);
+
+    if ($limit > strlen($character_list) && !$repeat) {
+        $limit = strlen($character_list);
+        $alertMessage = 'You dont generate this password, please toggle "yes" on repeat characters.';
+    } else {
+
+        $passworGen = randomPassword($limit, $character_list, $repeat);
+    }
+};
+
+function genCharacterList($letters, $numbers, $symbols)
+{
+    $character = '';
+    $character_letter = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $character_number = '0123456789';
+    $character_symbol = '!"$%&/()=?*-+;:._';
+
+
+    if ($letters) {
+        $character .= $character_letter;
+    }
+
+    if ($numbers) {
+        $character .= $character_number;
+    }
+
+    if ($symbols) {
+        $character .= $character_symbol;
+    }
+
+    if (!$letters && !$numbers && !$symbols) {
+        $character .= $character_letter . $character_number . $character_symbol;
+    }
+
+    //var_dump($character);
+    return $character;
+};
+
+function randomPassword($length, $characters, $repeated)
+{
+    $randomPassword = '';
+
+    for ($i = 1; $i <= $length; $i++) {
+        $random_character = $characters[rand(0, strlen($characters) - 1)];
+
+        if ($repeated) {
+            $randomPassword .= $random_character;
+        } else {
+            if (!str_contains($randomPassword, $random_character)) {
+                //var_dump('non è gia scritta', $random_character);
+                $randomPassword .= $random_character;
+            } else {
+                $i--;
+            }
+        }
+    }
+
+    //var_dump($randomPassword);
+    return $randomPassword;
+};
+
+?>
 
 
 <!DOCTYPE html>
@@ -48,34 +129,41 @@ Dare all’utente anche la possibilità di permettere o meno la ripetizione di c
     <div class="container text-center mt-5">
         <h1 class="mb-5">Password Generator 3.0</h1>
         <div class="card p-4">
+
+            <?php if (isset($alertMessage) && $alertMessage != '') : ?>
+                <div class="alert alert-danger" role="alert">
+                    <?= $alertMessage; ?>
+                </div>
+            <?php endif ?>
+
             <form action="" method="get">
 
                 <div class="input-group mb-3 py-3 border-bottom">
                     <label for="limit" class="me-5">Type a number to choose the password length</label>
-                    <input type="number" name="limit" id="limit" class="form-control" placeholder="Type a number" aria-label="Number" aria-describedby="basic-addon1" required>
+                    <input type="number" name="limit" id="limit" class="form-control rounded-3" placeholder="Type a number" aria-label="Number" aria-describedby="basic-addon1" required>
                 </div>
 
                 <div class="input-group mb-3 py-3 border-bottom">
                     <label class="me-auto">Do you want repeat characters?</label>
 
                     <label for="repeat-yes">Yes</label>
-                    <input value="1" type="radio" name="repeat" id="repeat-yes" class="mx-2">
+                    <input value="1" type="radio" name="repeat" id="repeat-yes" class="mx-2" checked>
 
                     <label for="repeat-no">no</label>
                     <input value="0" type="radio" name="repeat" id="repeat-no" class="mx-2">
                 </div>
 
-                <div class="input-group py-3 border-bottom">
+                <div class="input-group py-3 border-bottom" require>
                     <label class="me-auto">Choose a type of characters:</label>
 
                     <label for="letters">Letters</label>
-                    <input value="1" type="checkbox" name="repeat" id="letters" class="mx-2">
+                    <input value="1" type="checkbox" name="letters" id="letters" class="mx-2">
 
                     <label for="number" class="ms-4">Number</label>
-                    <input value="1" type="checkbox" name="repeat" id="number" class="mx-2">
+                    <input value="1" type="checkbox" name="number" id="number" class="mx-2">
 
                     <label for="symbol" class="ms-4">Symbol</label>
-                    <input value="1" type="checkbox" name="repeat" id="symbol" class="mx-2">
+                    <input value="1" type="checkbox" name="symbol" id="symbol" class="mx-2">
                 </div>
 
                 <button type="submit" class="btn btn-primary my-4">Genera</button>
@@ -84,9 +172,14 @@ Dare all’utente anche la possibilità di permettere o meno la ripetizione di c
 
             </form>
 
-            <div class="alert alert-primary" role="alert">
-                Your new password is:
-            </div>
+
+            <?php if (isset($passworGen) && $passworGen != '') : ?>
+                <div class="alert alert-primary" role="alert">
+                    Your new password is:
+                    <?= $passworGen; ?>
+                </div>
+            <?php endif ?>
+
         </div>
     </div>
 
